@@ -18,6 +18,7 @@ function App() {
       <Weather />
       <Routes>
         <Route path="/" element={isLogin ? <Main /> : <Login />} />
+        <Route path="/" element={isLogin ? <Main /> : <Login />} />
         <Route
           path="/oauth/callback/kakao"
           element={<KakaoRedirectHandler />}
