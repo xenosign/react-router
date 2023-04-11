@@ -1,5 +1,8 @@
 const express = require('express');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
+const session = require('express-session');
+
 require('dotenv').config();
 
 const { PORT } = process.env;
@@ -8,6 +11,14 @@ const server = express();
 server.use(express.json());
 server.use(express.urlencoded({ extended: false }));
 server.use(cors());
+server.use(cookieParser('tetz'));
+server.use(
+  session({
+    secret: 'tetz',
+    resave: false,
+    saveUninitialized: true,
+  }),
+);
 
 const dataRouter = require('./routes/data');
 const userRouter = require('./routes/user');

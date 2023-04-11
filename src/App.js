@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux';
 import { Route, Routes } from 'react-router-dom';
 import Main from './pages/Main';
 import Login from './pages/Login';
+import KakaoRedirectHandler from './components/KakaoRedirectHandler';
 
 function App() {
   const isLogin = useSelector((state) => state.user.isLogin);
@@ -13,6 +14,10 @@ function App() {
       <GlobalStyle />
       <Routes>
         <Route path="/" element={isLogin ? <Main /> : <Login />} />
+        <Route
+          path="/oauth/callback/kakao"
+          element={<KakaoRedirectHandler />}
+        />
       </Routes>
     </>
   );
