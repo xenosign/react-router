@@ -1,6 +1,13 @@
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
-const { DB_MODE, MYSQL_DB, MYSQL_TABLE } = process.env;
+const {
+  DB_MODE,
+  MYSQL_DB,
+  MYSQL_TABLE,
+  JWT_ACCESS_SECRET,
+  JWT_REFRESH_SECRET,
+} = process.env;
 
 if (DB_MODE === 'mysql') {
   const connection = require('./mysqlConnect');
@@ -50,9 +57,16 @@ if (DB_MODE === 'mysql') {
           );
 
           if (isSamePassword) {
-            req.session.login = true;
-            console.log(req.session);
-            return res.status(200).json('로그인 완료');
+            // accessToken 발행
+            const accessToken = jwt.sign(
+              { userID: data[0].USERID }, // 유저 정보
+              JWT_ACCESS_SECRET, // 일종의 salt
+              { expiresIn: '1d' }, // 옵션 중에서 만료기간
+            );
+
+            res
+              .status(200)
+              .json({ token: accessToken, message: '로그인 성공' });
           } else {
             return res.status(400).json('비밀 번호가 다릅니다');
           }
@@ -82,6 +96,15 @@ if (DB_MODE === 'mysql') {
     }
   };
 
+  const isToken = (req, res) => {
+    jwt.verify(req.body.token, JWT_ACCESS_SECRET, (err, decoded) => {
+      if (err) return res.status(401).json('토큰 기한 만료');
+      return res
+        .status(200)
+        .json({ userID: decoded.userID, msg: '토큰 검증 완료' });
+    });
+  };
+
   const kakaoLoginUser = (req, res) => {
     try {
       connection.query(
@@ -108,6 +131,7 @@ if (DB_MODE === 'mysql') {
     registerUser,
     loginUser,
     duplicateUser,
+    isToken,
   };
 } else {
   console.log(DB_MODE, '모드로 실행 중입니다!');

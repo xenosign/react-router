@@ -20,22 +20,29 @@ export default function Login() {
   const dispatch = useDispatch();
 
   const loginUser = async () => {
-    if (!loginIdInput.current.value || !loginPwInput.current.value)
-      return alert('필수 값을 입력해 주세요');
+    try {
+      if (!loginIdInput.current.value || !loginPwInput.current.value)
+        return alert('필수 값을 입력해 주세요');
 
-    const resLogin = await axios.post('http://localhost:4000/user/login', {
-      id: loginIdInput.current.value,
-      password: loginPwInput.current.value,
-    });
-
-    if (resLogin.status !== 200) return alert(resLogin.data);
-
-    dispatch(
-      login({
+      const resLogin = await axios.post('http://localhost:4000/user/login', {
         id: loginIdInput.current.value,
         password: loginPwInput.current.value,
-      }),
-    );
+      });
+
+      alert(resLogin.data.message);
+
+      // 로컬 스토리지에 로그인 정보 저장
+      window.localStorage.setItem('token', resLogin.data.token);
+
+      return dispatch(
+        login({
+          id: loginIdInput.current.value,
+        }),
+      );
+    } catch (err) {
+      console.log(err);
+      return alert(err.message);
+    }
   };
 
   const checkDuplicateUser = async () => {
