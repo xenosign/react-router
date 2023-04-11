@@ -21,8 +21,6 @@ function App() {
       });
 
       console.log(resToken);
-      alert(resToken.data.msg);
-
       dispatch(
         login({
           id: resToken.data.userID,

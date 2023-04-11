@@ -60,8 +60,10 @@ if (DB_MODE === 'mysql') {
             // accessToken 발행
             const accessToken = jwt.sign(
               { userID: data[0].USERID }, // 유저 정보
-              JWT_ACCESS_SECRET, // 일종의 salt
-              { expiresIn: '1d' }, // 옵션 중에서 만료기간
+              JWT_ACCESS_SECRET, // jwt 암호화 인증 키
+              // 옵션 중에서 만료기간 설정, 해당 기간으로 로그인 유지 기간이 정해집니다
+              // 현재는 1시간으로 설정, '1d' 같은 값을 넣으면 하루 설정 가능
+              { expiresIn: 60 * 60 * 60 },
             );
 
             res
