@@ -9,6 +9,8 @@ export default function Login() {
   const KAKAO_CLIENT_ID = '2be90ab71a1f36d735f12cd91b53a982';
   const KAKAO_REDIRECT_URI = 'http://localhost:3000/oauth/callback/kakao';
   const KAKAO_AUTH_URL = `https://kauth.kakao.com/oauth/authorize?client_id=${KAKAO_CLIENT_ID}&redirect_uri=${KAKAO_REDIRECT_URI}&response_type=code`;
+  const KAKAO_LOGOUT_URI = 'http://localhost:3000';
+  const KAKAO_LOGOUT_URL = `https://kauth.kakao.com/oauth/logout?client_id=${KAKAO_CLIENT_ID}&logout_redirect_uri=${KAKAO_LOGOUT_URI}`;
 
   const loginIdInput = useRef();
   const loginPwInput = useRef();
@@ -111,6 +113,7 @@ export default function Login() {
       <br />
       <button onClick={loginUser}>로그인</button>{' '}
       <Link to={KAKAO_AUTH_URL}>카카오 로그인</Link>
+      <Link to={KAKAO_LOGOUT_URL}>카카오 로그 아웃</Link>
       <br />
       <br />
       {/* 회원 가입 파트 */}
