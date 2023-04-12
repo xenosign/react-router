@@ -31,7 +31,9 @@ export default function Login() {
 
       alert(resLogin.data.message);
 
-      // 로컬 스토리지에 로그인 정보 저장
+      // 로그인이 성공하면 응답 데이터 token 프로퍼티에 accessToken 이 전달 되어 오므로
+      // 로컬 스토리지에 로그인 정보가 저장 된 토큰을 저장
+      // 해당 정보를 통하여 리액트 실행 시, 토큰을 백엔드 서버에 검증하여 자동 로그인을 처리
       window.localStorage.setItem('token', resLogin.data.token);
 
       return dispatch(
