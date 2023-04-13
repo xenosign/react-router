@@ -168,13 +168,17 @@ export function reset() {
   };
 }
 
+let test = '';
+
 export default function mbti(state = initStateEmpty, action) {
   switch (action.type) {
     case INIT:
+      test = 'tttt';
       return {
         ...state,
         survey: action.payload.survey,
         explanation: action.payload.explanation,
+        test,
       };
     case CHECK:
       return {

@@ -23,13 +23,15 @@ export function logout() {
   };
 }
 
+let testValue;
+
 // 리듀서 일해라
 export default function user(state = initState, action) {
   switch (action.type) {
     case LOGIN:
       return {
         ...state,
-        userID: action.payload.id,
+        userID: testValue,
         isLogin: true,
       };
     case LOGOUT:

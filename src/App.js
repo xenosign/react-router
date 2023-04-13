@@ -9,6 +9,8 @@ import KakaoRedirectHandler from './components/KakaoRedirectHandler';
 import { Route, Routes } from 'react-router-dom';
 import axios from 'axios';
 import { login } from './store/modules/user';
+import LocationComponent from './components/LocationComponent';
+import GithubRedirectHandler from './components/GithubRedirectHandler';
 
 function App() {
   const isLogin = useSelector((state) => state.user.isLogin);
@@ -23,6 +25,7 @@ function App() {
       });
 
       // 토큰 검증 결과를 받아서 처리, 필요 데이터는 data 에 담아서 전송되므로 필요한 정보 세팅
+      console.log(resToken);
       alert(resToken.data.msg);
 
       // 토큰 검증이 성공 적으로 검증이 되었으므로 리덕스에 로그인 처리
@@ -46,11 +49,16 @@ function App() {
   return (
     <>
       <GlobalStyle />
+      {/* <LocationComponent /> */}
       <Routes>
-        <Route path="/" element={isLogin ? <Main /> : <Login />} />
+        <Route path="/*" element={isLogin ? <Main /> : <Login />} />
         <Route
           path="/oauth/callback/kakao"
           element={<KakaoRedirectHandler />}
+        />
+        <Route
+          path="/oauth/callback/github"
+          element={<GithubRedirectHandler />}
         />
       </Routes>
     </>

@@ -12,6 +12,10 @@ export default function Login() {
   const KAKAO_LOGOUT_URI = 'http://localhost:3000';
   const KAKAO_LOGOUT_URL = `https://kauth.kakao.com/oauth/logout?client_id=${KAKAO_CLIENT_ID}&logout_redirect_uri=${KAKAO_LOGOUT_URI}`;
 
+  const GITHUB_CLIENT_ID = 'Iv1.1b017e86d5470be6';
+  const GITHUB_REDIRECT_URI = 'http://localhost:3000/oauth/callback/github';
+  const GITHUB_LOGIN_URL = `https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${GITHUB_REDIRECT_URI}`;
+
   const loginIdInput = useRef();
   const loginPwInput = useRef();
   const registerIdInput = useRef();
@@ -121,8 +125,9 @@ export default function Login() {
       <br />
       <br />
       <button onClick={loginUser}>로그인</button>{' '}
-      <Link to={KAKAO_AUTH_URL}>카카오 로그인</Link>
-      <Link to={KAKAO_LOGOUT_URL}>카카오 로그 아웃</Link>
+      <Link to={KAKAO_AUTH_URL}>카카오 로그인</Link>{' '}
+      <Link to={KAKAO_LOGOUT_URL}>카카오 로그 아웃</Link>{' '}
+      <Link to={GITHUB_LOGIN_URL}>깃 로그인</Link>
       <br />
       <br />
       {/* 회원 가입 파트 */}

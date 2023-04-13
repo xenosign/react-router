@@ -104,7 +104,7 @@ if (DB_MODE === 'mysql') {
 
   // 브라우저 로컬 스토리지에 저장 된, 토큰을 검증하는 컨트롤러
   // 토큰 검증이 완료 되면 원하는 정보를 담아서 전달해 준다 -> 프론트에서는 로그인 처리
-  const isToken = (req, res) => {
+  const verifyToken = (req, res) => {
     jwt.verify(req.body.token, JWT_ACCESS_SECRET, (err, decoded) => {
       // 토큰 검증 실패 시, 권한 없음 결과 전달
       if (err) return res.status(401).json('토큰 기한 만료');
@@ -141,7 +141,7 @@ if (DB_MODE === 'mysql') {
     registerUser,
     loginUser,
     duplicateUser,
-    isToken,
+    verifyToken,
   };
 } else {
   console.log(DB_MODE, '모드로 실행 중입니다!');

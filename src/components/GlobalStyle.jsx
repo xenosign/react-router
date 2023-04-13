@@ -10,7 +10,6 @@ const GlobalStyle = createGlobalStyle`
   }
 
   body {
-    font-family: 'PilseungGothic';
     padding-top: 1em;
     white-space: pre-wrap;
     text-align: center;
