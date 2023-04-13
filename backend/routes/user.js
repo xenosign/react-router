@@ -6,6 +6,7 @@ const {
   loginUser,
   duplicateUser,
   verifyToken,
+  gitLogin,
 } = require('../controllers/userController');
 
 const isLogin = (req, res, next) => {
@@ -19,5 +20,6 @@ router.post('/test', isLogin);
 // 토큰 검증용 라우터 주소 설정
 // localhost:4000/user/token 으로 요청을 보내면 된다
 router.post('/token', verifyToken);
+router.post('/gitlogin', gitLogin);
 
 module.exports = router;

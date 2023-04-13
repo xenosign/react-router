@@ -1,5 +1,6 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const axios = require('axios');
 
 const {
   DB_MODE,
@@ -115,6 +116,53 @@ if (DB_MODE === 'mysql') {
     });
   };
 
+  // 깃헙 로그인 구현 시작
+  const GITHUB_CLIENT_ID = 'Iv1.1b017e86d5470be6';
+  const GITHUB_REDIRECT_URI = 'http://localhost:3000/oauth/callback/github';
+  const GITHUB_CLIENT_SECRET = 'e25c64ba00ab596c8e9ee2e639bc2fa06e189a8e';
+
+  const gitLogin = async (req, res) => {
+    try {
+      const ACCESS_TOKEN_URL = `https://github.com/login/oauth/access_token?client_id=${GITHUB_CLIENT_ID}&client_secret=${GITHUB_CLIENT_SECRET}&code=${req.body.token}`;
+
+      const resCode = await axios.post(ACCESS_TOKEN_URL, {
+        Accept: 'application/json',
+      });
+
+      // 토큰 발행 성공시에도 status 가 200으로 찍히며, 결과 값을 하나의 긴 쿼리 스트링으로 들어오기 때문에
+      // 문장 내부에 access_token 이라는 단어가 있으면 토큰 발행 성공으로 간주
+      // 실패할 경우 err_status 같은 문장이 찍힘
+      if (resCode.data.indexOf('access_token') === -1)
+        return res.status(400).json('토큰 발행 실패');
+
+      console.log('깃헙 엑세스 토큰 전체 String', resCode.data);
+
+      // 문장 내부에서 access_token 만 분리해 내야하므로 전체 문장에서 특정 단어를 찾아서 해당 단어의 index 를 기준으로 문장을 자름
+      const tokenStr = resCode.data;
+      // access_token= 로 토큰이 시작 되므로 처음 시작되는 n= 의 위치를 찾아서 + 2를 더하면 토큰의 시작 index 찾기 가능
+      // = 로 해도 되지만 만에 하나 토큰에 = 이 포함 될 경우를 고려하여 n= 를 찾음
+      const startIndex = tokenStr.indexOf('n=') + 2;
+      // 토큰이 끝나면 토큰의 만료일이 &expires 로 표현이 되므로 &exp 단어를 찾아서 해당 위치를 access_token 의 마지막 지정으로 설정
+      const endIndex = tokenStr.indexOf('&exp');
+
+      // 문장을 잘라서 access_token 만 추출출
+      const accessToken = tokenStr.substring(startIndex, endIndex);
+      console.log('깃헙 엑세스 토큰', accessToken);
+
+      // 분리한 엑세스 토큰을 엑세스 토큰을 풀어주는 깃헙 api 에 요청
+      const resToken = await axios.get('https://api.github.com/user', {
+        headers: {
+          authorization: `token ${accessToken}`,
+        },
+      });
+
+      // api 에서 제공하는 사용자 정보를 획득 + 프론트로 전송
+      return res.status(200).json(resToken.data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   const kakaoLoginUser = (req, res) => {
     try {
       connection.query(
@@ -142,6 +190,7 @@ if (DB_MODE === 'mysql') {
     loginUser,
     duplicateUser,
     verifyToken,
+    gitLogin,
   };
 } else {
   console.log(DB_MODE, '모드로 실행 중입니다!');
