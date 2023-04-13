@@ -12,6 +12,7 @@ export default function Login() {
   const KAKAO_LOGOUT_URI = 'http://localhost:3000';
   const KAKAO_LOGOUT_URL = `https://kauth.kakao.com/oauth/logout?client_id=${KAKAO_CLIENT_ID}&logout_redirect_uri=${KAKAO_LOGOUT_URI}`;
 
+  // 깃헙 로그인 용 정보, 직접 만든 클라이언트 정보를 등록해 주세요!
   const GITHUB_CLIENT_ID = 'Iv1.1b017e86d5470be6';
   const GITHUB_REDIRECT_URI = 'http://localhost:3000/oauth/callback/github';
   const GITHUB_LOGIN_URL = `https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${GITHUB_REDIRECT_URI}`;
