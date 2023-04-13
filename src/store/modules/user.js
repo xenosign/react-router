@@ -31,8 +31,8 @@ export default function user(state = initState, action) {
     case LOGIN:
       return {
         ...state,
-        userID: testValue,
-        isLogin: true,
+        userID: action.payload.id,
+        isLogin: false,
       };
     case LOGOUT:
       return {
