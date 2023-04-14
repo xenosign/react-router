@@ -86,33 +86,11 @@ export default function Login() {
       dispatch(
         login({
           id: registerIdInput.current.value,
-          password: registerPwInput.current.value,
         }),
       );
     } catch (err) {
       alert(err.response.data);
     }
-
-    // const resRegister = await fetch('http://localhost:4000/user/register', {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //   },
-    //   body: JSON.stringify({
-    //     id: registerIdInput.current.value,
-    //     password: registerPwInput.current.value,
-    //   }),
-    // });
-
-    // if (resRegister.status !== 200) return alert(await resRegister.json());
-
-    // alert(await resRegister.json());
-    // dispatch(
-    //   login({
-    //     id: registerIdInput.current.value,
-    //     password: registerPwInput.current.value,
-    //   }),
-    // );
   };
 
   return (

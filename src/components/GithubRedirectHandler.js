@@ -22,10 +22,14 @@ export default function GithubRedirectHandler() {
           },
         );
 
-        // 백엔드에서 받아온 깃헙 사용자 정보 출력
-        console.log('깃헙 로그인 성공', resGitLogin.data);
+        // 로그인 성공 메세지 전달
+        console.log('깃헙 로그인 성공');
+
+        // 깃헙 로그인 정보를 바탕으로 생성한 토큰을 LocalStorage 에 저장
+        window.localStorage.setItem('token', resGitLogin.data.token);
+
         // 로그인 처리
-        dispatch(login({ id: resGitLogin.data.email }));
+        dispatch(login({ id: resGitLogin.data.userID }));
         navigate('/');
       } catch (err) {
         console.log('깃헙 로그인 에러 발생', err);

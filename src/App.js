@@ -25,7 +25,7 @@ function App() {
       });
 
       // 토큰 검증 결과를 받아서 처리, 필요 데이터는 data 에 담아서 전송되므로 필요한 정보 세팅
-      // console.log(resToken);
+      console.log(resToken);
       // alert(resToken.data.msg);
 
       // 토큰 검증이 성공 적으로 검증이 되었으므로 리덕스에 로그인 처리
