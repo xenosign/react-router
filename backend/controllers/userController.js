@@ -142,8 +142,6 @@ if (DB_MODE === 'mysql') {
       if (resCode.data.indexOf('access_token') === -1)
         return res.status(400).json('토큰 발행 실패');
 
-      console.log('깃헙 엑세스 토큰 전체 String', resCode.data);
-
       // 문장 내부에서 access_token 만 분리해 내야하므로 전체 문장에서 특정 단어를 찾아서 해당 단어의 index 를 기준으로 문장을 자름
       const tokenStr = resCode.data;
       // access_token= 로 토큰이 시작 되므로 처음 시작되는 n= 의 위치를 찾아서 + 2를 더하면 토큰의 시작 index 찾기 가능
@@ -205,12 +203,101 @@ if (DB_MODE === 'mysql') {
     }
   };
 
+  // 카카오 로그인 구현 시작
+  // 깃헙 로그인과 달리 카카오 서버에서 토큰을 처리하는 부분은 프론트에서 전부 처리하기 때문에 구조가 다릅니다!
+  const kakaoLogin = async (req, res) => {
+    try {
+      // 프론트에서 전달한 kakao 서버에 저장 된 이메일을 userID 로 사용할 것이므로 해당 정보를 accessToken 으로 발행
+      const accessToken = await issueToken(req.body.userID);
+
+      // 카카오 로그인한 사용자가 DB에 등록 되어 있는지 확인 후
+      // 등록 안되어 있으면 회원 가입 후 로그인 처리, 되어 있으면 로그인 처리
+      connection.query(
+        `SELECT * FROM ${MYSQL_DB}.${MYSQL_TABLE} WHERE USERID = '${req.body.userID}';`,
+        (err, data) => {
+          if (err) throw err;
+          // DB에 사용자가 있는 케이스이므로 토큰과 사용자 ID를 전달하면서 로그인 처리
+          if (data.length !== 0)
+            return res.status(200).json({
+              token: accessToken,
+              userID: req.body.userID,
+              message: '로그인 성공',
+            });
+
+          // SNS 로그인 사용자의 경우 서비스 제공자 입장에서도 해당 이용자의 비번을 알면 안되므로
+          // 랜덤한 숫자를 발생시켜서 해당 숫자를 암호화 하여 비밀번호로 저장
+          const encryptedPassword = bcrypt.hashSync(`${Math.random()}`, 10);
+
+          // DB에 사용자가 없으면 회원 가입 처리 후, 토큰과 사용자 ID를 전달하면서 로그인 처리
+          connection.query(
+            `INSERT INTO ${MYSQL_DB}.${MYSQL_TABLE} (USERID, PASSWORD) values ('${req.body.userID}', '${encryptedPassword}')`,
+            (err, data) => {
+              if (err) throw err;
+              res.status(200).json({
+                token: accessToken,
+                userID: req.body.userID,
+                message: '로그인 성공',
+              });
+            },
+          );
+        },
+      );
+    } catch (err) {
+      console.log(err);
+      res.status(500).json('카카오 로그인 중, 알 수 없는 에러 발생');
+    }
+  };
+
+  // 네이버 로그인 구현 시작
+  const NAVER_CLIENT_ID = '_UmPcWI1byBAwXFr7Z3Y';
+  const NAVER_REDIRECT_URL = 'http://localhost:3000/oauth/callback/naver';
+  const NAVER_CLIENT_SECRET = 'yhdvc_FRRu';
+
+  const naverLogin = async (req, res) => {
+    console.log(req.body.CODE);
+    console.log(req.body.STATE);
+    try {
+      const resNaverToken = await axios({
+        method: 'POST',
+        url: 'https://nid.naver.com/oauth2.0/token',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        params: {
+          grant_type: 'authorization_code',
+          client_id: NAVER_CLIENT_ID,
+          client_secret: NAVER_CLIENT_SECRET,
+          redirect_uri: NAVER_REDIRECT_URL,
+          code: req.body.CODE,
+          state: req.body.STATE,
+        },
+      });
+
+      console.log(resNaverToken.data);
+
+      // 네이버 사용자 정보 요청
+      const resNaverUserInfo = await axios({
+        method: 'GET',
+        url: 'https://openapi.naver.com/v1/nid/me',
+        headers: {
+          Authorization: `Bearer ${resNaverToken.data.access_token}`,
+        },
+      });
+
+      console.log(resNaverUserInfo.data);
+    } catch (error) {
+      console.error('err');
+    }
+  };
+
   module.exports = {
     registerUser,
     loginUser,
     duplicateUser,
     verifyToken,
     gitLogin,
+    kakaoLogin,
+    naverLogin,
   };
 } else {
   console.log(DB_MODE, '모드로 실행 중입니다!');

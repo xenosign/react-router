@@ -11,6 +11,7 @@ import axios from 'axios';
 import { login } from './store/modules/user';
 import LocationComponent from './components/LocationComponent';
 import GithubRedirectHandler from './components/GithubRedirectHandler';
+import NaverRedirectHandler from './components/NaverRedirectHandler copy';
 
 function App() {
   const isLogin = useSelector((state) => state.user.isLogin);
@@ -59,6 +60,10 @@ function App() {
         <Route
           path="/oauth/callback/github"
           element={<GithubRedirectHandler />}
+        />
+        <Route
+          path="/oauth/callback/naver"
+          element={<NaverRedirectHandler />}
         />
       </Routes>
     </>

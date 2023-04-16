@@ -7,6 +7,8 @@ const {
   duplicateUser,
   verifyToken,
   gitLogin,
+  kakaoLogin,
+  naverLogin,
 } = require('../controllers/userController');
 
 const isLogin = (req, res, next) => {
@@ -21,5 +23,7 @@ router.post('/test', isLogin);
 // localhost:4000/user/token 으로 요청을 보내면 된다
 router.post('/token', verifyToken);
 router.post('/gitlogin', gitLogin);
+router.post('/kakaologin', kakaoLogin);
+router.post('/naverlogin', naverLogin);
 
 module.exports = router;

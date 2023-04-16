@@ -1,8 +1,11 @@
 import axios from 'axios';
-import React, { useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { login } from '../store/modules/user';
+
+// 네이버 로그인용, index.html 에 불러온 모듈을 불러온다
+const { naver } = window;
 
 export default function Login() {
   // REST API 키를 입력 해야 합니다!
@@ -93,6 +96,24 @@ export default function Login() {
     }
   };
 
+  // 네이버 로그인 구현
+  const NAVER_CLIENT_ID = '_UmPcWI1byBAwXFr7Z3Y';
+  const NAVER_REDIRECT_URL = 'http://localhost:3000/oauth/callback/naver';
+
+  const initializeNaverLogin = () => {
+    const naverLogin = new naver.LoginWithNaverId({
+      clientId: NAVER_CLIENT_ID, // 발급받은 client ID
+      callbackUrl: NAVER_REDIRECT_URL, // app 등록할 때 callbackurl에 추가해주었던 url
+      isPopup: false, // popup 형식으로 띄울것인지 설정
+      loginButton: { color: 'white', type: 1, height: '47' }, // 버튼의 스타일, 타입, 크기를 지정
+    });
+    naverLogin.init();
+  };
+
+  useEffect(() => {
+    initializeNaverLogin();
+  }, []);
+
   return (
     <>
       {/* 로그인 파트 */}
@@ -107,6 +128,8 @@ export default function Login() {
       <Link to={KAKAO_AUTH_URL}>카카오 로그인</Link>{' '}
       <Link to={KAKAO_LOGOUT_URL}>카카오 로그 아웃</Link>{' '}
       <Link to={GITHUB_LOGIN_URL}>깃 로그인</Link>
+      {/* 네이버 아이디 로그인을 위한 div 설정 */}
+      <div id="naverIdLogin"></div>
       <br />
       <br />
       {/* 회원 가입 파트 */}
