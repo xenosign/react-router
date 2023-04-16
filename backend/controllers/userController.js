@@ -267,7 +267,7 @@ if (DB_MODE === 'mysql') {
             return res.status(200).json({
               token: accessToken,
               userID: req.body.userID,
-              message: '로그인 성공',
+              message: '로그인 성공!',
             });
 
           // SNS 로그인 사용자의 경우 서비스 제공자 입장에서도 해당 이용자의 비번을 알면 안되므로
