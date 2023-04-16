@@ -249,44 +249,47 @@ if (DB_MODE === 'mysql') {
   };
 
   // 네이버 로그인 구현 시작
-  const NAVER_CLIENT_ID = '_UmPcWI1byBAwXFr7Z3Y';
-  const NAVER_REDIRECT_URL = 'http://localhost:3000/oauth/callback/naver';
-  const NAVER_CLIENT_SECRET = 'yhdvc_FRRu';
+  // 프론트에서 네이버 SDK 을 사용해서 사용자 정보를 받아 오므로, 회원 가입 및 로그인 처리만 하면 완료!
 
   const naverLogin = async (req, res) => {
-    console.log(req.body.CODE);
-    console.log(req.body.STATE);
     try {
-      const resNaverToken = await axios({
-        method: 'POST',
-        url: 'https://nid.naver.com/oauth2.0/token',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        params: {
-          grant_type: 'authorization_code',
-          client_id: NAVER_CLIENT_ID,
-          client_secret: NAVER_CLIENT_SECRET,
-          redirect_uri: NAVER_REDIRECT_URL,
-          code: req.body.CODE,
-          state: req.body.STATE,
-        },
-      });
+      // 프론트에서 전달한 네이버 이메일을 userID 로 사용할 것이므로 해당 정보를 accessToken 으로 발행
+      const accessToken = await issueToken(req.body.userID);
 
-      console.log(resNaverToken.data);
+      // 네이버 로그인한 사용자가 DB에 등록 되어 있는지 확인 후
+      // 등록 안되어 있으면 회원 가입 후 로그인 처리, 되어 있으면 로그인 처리
+      connection.query(
+        `SELECT * FROM ${MYSQL_DB}.${MYSQL_TABLE} WHERE USERID = '${req.body.userID}';`,
+        (err, data) => {
+          if (err) throw err;
+          // DB에 사용자가 있는 케이스이므로 토큰과 사용자 ID를 전달하면서 로그인 처리
+          if (data.length !== 0)
+            return res.status(200).json({
+              token: accessToken,
+              userID: req.body.userID,
+              message: '로그인 성공',
+            });
 
-      // 네이버 사용자 정보 요청
-      const resNaverUserInfo = await axios({
-        method: 'GET',
-        url: 'https://openapi.naver.com/v1/nid/me',
-        headers: {
-          Authorization: `Bearer ${resNaverToken.data.access_token}`,
+          // SNS 로그인 사용자의 경우 서비스 제공자 입장에서도 해당 이용자의 비번을 알면 안되므로
+          // 랜덤한 숫자를 발생시켜서 해당 숫자를 암호화 하여 비밀번호로 저장
+          const encryptedPassword = bcrypt.hashSync(`${Math.random()}`, 10);
+
+          // DB에 사용자가 없으면 회원 가입 처리 후, 토큰과 사용자 ID를 전달하면서 로그인 처리
+          connection.query(
+            `INSERT INTO ${MYSQL_DB}.${MYSQL_TABLE} (USERID, PASSWORD) values ('${req.body.userID}', '${encryptedPassword}')`,
+            (err, data) => {
+              if (err) throw err;
+              res.status(200).json({
+                token: accessToken,
+                userID: req.body.userID,
+                message: '로그인 성공',
+              });
+            },
+          );
         },
-      });
-
-      console.log(resNaverUserInfo.data);
+      );
     } catch (error) {
-      console.error('err');
+      console.error('네이버 로그인 중, 알 수 없는 에러 발생 ');
     }
   };
 
