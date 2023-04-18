@@ -31,7 +31,7 @@ if (DB_MODE === 'mysql') {
     jwt.verify(req.body.token, JWT_ACCESS_SECRET, (err, decoded) => {
       // console.log(req.body.token);
       // 토큰 검증 실패 시, 권한 없음 결과 전달
-      if (err) return res.status(401).json('토큰 기한 만료');
+      if (err) return res.status(401).json('토큰 기한 만료!');
       // 토큰 검증 성공 시, 토큰을 푼 결과(decoded) 안의 userID 를 받아서 프론트에 전달
       return res
         .status(200)
