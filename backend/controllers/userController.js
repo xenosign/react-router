@@ -244,7 +244,7 @@ if (DB_MODE === 'mysql') {
       );
     } catch (err) {
       console.log(err);
-      res.status(500).json('카카오 로그인 중, 알 수 없는 에러 발생');
+      res.status(500).json('카카오 로그인 중, 알 수 없는 에러 발생!');
     }
   };
 
